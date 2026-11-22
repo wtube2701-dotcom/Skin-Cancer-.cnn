@@ -4,3 +4,4 @@ pandas
 numpy
 pillow
 matplotlib
+TensorFlow version: 2.21.0
