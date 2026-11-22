@@ -2,20 +2,26 @@ import streamlit as st
 import tensorflow as tf
 import numpy as np
 from PIL import Image
+import os
 
 st.title("Skin Lesion Classification App")
 st.write("Upload an image of a skin lesion to get a prediction from our trained CNN model.")
 
+MODEL_PATH = 'skin_lesion_model.keras'
+
 # Load the saved model
 @st.cache_resource
 def load_my_model():
-    return tf.keras.models.load_model('skin_lesion_model.keras')
+    if not os.path.exists(MODEL_PATH):
+        raise FileNotFoundError(f"Model file '{MODEL_PATH}' not found. Found files: {os.listdir('.')}")
+    return tf.keras.models.load_model(MODEL_PATH)
 
 try:
     model = load_my_model()
     st.success("Model loaded successfully!")
 except Exception as e:
     st.error(f"Error loading model: {e}")
+    st.stop()  # Stops the app here so it doesn't throw NameError later
 
 # Class names ordered logically
 class_names = ['akiec', 'bcc', 'bkl', 'df', 'mel', 'nv', 'vasc']
@@ -39,8 +45,8 @@ if uploaded_file is not None:
     
     # Preprocess image to match training: 28x28 RGB normalized to [0,1]
     resized_image = image.resize((28, 28)).convert('RGB')
-    img_array = np.array(resized_image) / 255.0
-    img_array = np.expand_dims(img_array, axis=0) # Add batch dimension (1, 28, 28, 3)
+    img_array = np.array(resized_image, dtype=np.float32) / 255.0
+    img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension (1, 28, 28, 3)
     
     # Make prediction
     predictions = model.predict(img_array)
