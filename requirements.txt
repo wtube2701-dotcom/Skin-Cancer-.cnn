@@ -3,9 +3,3 @@ tensorflow
 pandas
 numpy
 pillow
-matplotlib
-TensorFlow version: 2.21.0
-streamlit
-tensorflow
-numpy
-pillow
